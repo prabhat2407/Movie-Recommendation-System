@@ -1,0 +1,63 @@
+body {
+    background-color: #35363a;
+    font-family: Cambria;
+}
+
+.home_lnkhov, .Profile_lnkhov, .login_lnkhov {
+    color: white;
+}
+.home_lnkhov:hover, .login_lnkhov:hover {
+    color: #e7d84b;
+}
+
+.ContentCenter {
+    padding-top: 14%;
+}
+
+.ProfileContentCenter {
+    padding-top: 75px;
+}
+
+.tool .tooltext {
+    visibility: hidden;
+    width: 250%;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 80%;
+    margin-left: -200px;
+}
+.tool .tooltext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+.tool:hover .tooltext {
+    visibility: visible;
+    opacity: 1;
+}
+
+.rainbow {
+    text-shadow: 2px 2px 4px #7B7D7D;
+    -webkit-animation: rainbow 5s ease-in-out infinite;
+}
+@-webkit-keyframes rainbow {
+    0%{color: #360745;}
+    25%{color: #d61c59;}
+    50%{color: #e7d84b;}
+    75%{color: #efeac5;}
+    100%{color: #1b8798;}
+}
+
+#NewPasswordPhoneShowHide {
+    display: none;
+}
