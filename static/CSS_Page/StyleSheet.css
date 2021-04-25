@@ -3,7 +3,7 @@ body {
     font-family: Cambria;
 }
 
-.home_lnkhov, .Profile_lnkhov, .login_lnkhov {
+.home_lnkhov, .Profile_lnkhov, .login_lnkhov, .SortMovie_lnkhov {
     color: white;
 }
 .home_lnkhov:hover, .login_lnkhov:hover {

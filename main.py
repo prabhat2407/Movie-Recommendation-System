@@ -42,7 +42,7 @@ def Home():
             names.append(string.strip())
         print(names)
 
-        mname1 = mname[28:]
+        mname1 = mname[29:]
         for j in (mname1):
             if j == '/images/icons/mc-mustsee-sm.svg':
                 pass
@@ -98,7 +98,7 @@ def Home():
                 print(name)
 
 
-                gname1 = gname[28:]
+                gname1 = gname[29:]
                 for j in (gname1):
                     if j == '/images/icons/mc-mustsee-sm.svg':
                         pass
@@ -141,8 +141,16 @@ def Genreform():
             sess = session['Id']
             sess = str(sess)
             cur = mysql.connection.cursor()
-            cur.execute("INSERT INTO fav (Id, Genre) VALUES (%s, %s)", (sess, GenreData))
-            mysql.connection.commit()
+            cur.execute("SELECT Genre FROM fav WHERE Id = '" + sess + "'")
+            gdata = cur.fetchone()
+            if gdata == None:
+                cur.execute("INSERT INTO fav (Id, Genre) VALUES (%s, %s)", (sess, GenreData))
+                mysql.connection.commit()
+                return redirect(url_for('Home'))
+            else:
+                cur.execute("UPDATE fav SET Genre = '" + GenreData + "'WHERE Id = '" + sess + "'")
+                mysql.connection.commit()
+                return redirect(url_for('Home'))
     return redirect(url_for('Home'))
 
 @web.route('/Register', methods=['POST', 'GET'])
@@ -254,8 +262,71 @@ def HelpMessage(Id):
 @web.route('/Profile')
 def Profile():
     if 'LoggedIn' in session:
-        return render_template('Profile.html')
+        sess = session['Id']
+        sess = str(sess)
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT Genre FROM fav WHERE Id = '" + sess + "'")
+        gdata = cur.fetchone()
+        g = gdata[0]
+        print(gdata)
+        return render_template('Profile.html', gdata = g)
     return render_template('Profile.html')
+
+@web.route('/MSearch',methods=['POST','GET'])
+def MSearch():
+    if request.method == 'POST':
+        search = request.form['Search']
+        s = search.replace(' ','%20')
+        print(s)
+        out = []
+        sname = []
+        names = []
+        simg = []
+        sdesc = []
+
+        ssource = "https://www.metacritic.com/search/movie/"+s+"/results"
+        sreq = requests.get(ssource, headers = headers)
+        ssoup = BeautifulSoup(sreq.content, features = "lxml")
+
+
+        for img in ssoup.findAll('img'):
+            sname.append(img.get('alt'))
+
+        for i in sname[28:]:
+            if i != None:
+                names.append(i[:-9])
+            else:
+                pass
+        print(names)
+
+        ssimg = []
+        seimg =[]
+        for img in ssoup.findAll('img'):
+            simg.append(img.get('src'))
+        # for i in simg:
+        #     # print(i)
+        for j in simg:
+            if j == '/images/icons/mc-mustsee-sm.svg':
+                pass
+            else:
+                ssimg.append(j)
+        for i in ssimg[27:]:
+            seimg.append(i)
+        print(seimg)
+
+        for i in ssoup.find_all('p', class_="deck basic_stat"):
+            string = i.text
+            sdesc.append(string.strip())
+        print(sdesc)
+
+        for i, j, k in zip(seimg, names, sdesc):
+            out.append(i)
+            out.append(j)
+            out.append(k)
+        print(out)
+
+        return render_template("Home.html", out = out)
+    return render_template("Home.html")
 
 @web.route('/Genre')
 def Genre():
@@ -263,243 +334,490 @@ def Genre():
 
 @web.route('/Sad')
 def Sad():
-    output = []
-    mimg = []
-    mname = []
-    names = []
-    mdesc = []
 
-    link = "https://www.metacritic.com/browse/movies/genre/metascore/comedy?view=detailed"
-    req = requests.get(link, headers=headers)
-    soup = BeautifulSoup(req.content, features="lxml")
+    if request.method == 'POST':
+        srtname = request.form['customRadio']
+        output = []
+        mimg = []
+        mname = []
+        names = []
+        mdesc = []
 
-    for img in soup.findAll('img'):
-        mname.append(img.get('src'))
+        link = "https://www.metacritic.com/browse/movies/genre/"+srtname+"/comedy?view=detailed"
+        req = requests.get(link, headers=headers)
+        soup = BeautifulSoup(req.content, features="lxml")
 
-    for i in soup.find_all('a', class_="title"):
-        string = i.text
-        names.append(string.strip())
-    print(names)
+        for img in soup.findAll('img'):
+            mname.append(img.get('src'))
 
-    mname1 = mname[28:]
-    for j in (mname1):
-        if j == '/images/icons/mc-mustsee-sm.svg':
-            pass
-        else:
-            mimg.append(j)
-    print(mimg)
+        for i in soup.find_all('a', class_="title"):
+            string = i.text
+            names.append(string.strip())
+        print(names)
 
-    for i in soup.find_all('div', class_="summary"):
-        string = i.text
-        mdesc.append(string.strip())
-    print(mdesc)
+        mname1 = mname[29:]
+        for j in (mname1):
+            if j == '/images/icons/mc-mustsee-sm.svg':
+                pass
+            else:
+                mimg.append(j)
+        print(mimg)
 
-    for i, j, k in zip(mimg, names, mdesc):
-        output.append(i)
-        output.append(j)
-        output.append(k)
-    print(output)
-    return render_template("Sad.html", output = output)
+        for i in soup.find_all('div', class_="summary"):
+            string = i.text
+            mdesc.append(string.strip())
+        print(mdesc)
 
-@web.route('/Anger')
+        for i, j, k in zip(mimg, names, mdesc):
+            output.append(i)
+            output.append(j)
+            output.append(k)
+        print(output)
+        return render_template("Sad.html", output = output)
+    else:
+        output = []
+        mimg = []
+        mname = []
+        names = []
+        mdesc = []
+
+        link = "https://www.metacritic.com/browse/movies/genre/metascore/comedy?view=detailed"
+        req = requests.get(link, headers=headers)
+        soup = BeautifulSoup(req.content, features="lxml")
+
+        for img in soup.findAll('img'):
+            mname.append(img.get('src'))
+
+        for i in soup.find_all('a', class_="title"):
+            string = i.text
+            names.append(string.strip())
+        print(names)
+
+        mname1 = mname[29:]
+        for j in (mname1):
+            if j == '/images/icons/mc-mustsee-sm.svg':
+                pass
+            else:
+                mimg.append(j)
+        print(mimg)
+
+        for i in soup.find_all('div', class_="summary"):
+            string = i.text
+            mdesc.append(string.strip())
+        print(mdesc)
+
+        for i, j, k in zip(mimg, names, mdesc):
+            output.append(i)
+            output.append(j)
+            output.append(k)
+        print(output)
+        return render_template("Sad.html", output=output)
+    return render_template("Sad.html")
+
+@web.route('/Anger', methods=['POST', 'GET'])
 def Anger():
-    output = []
-    mimg = []
-    mname = []
-    names = []
-    mdesc = []
+    if request.method == 'POST':
+        srtname = request.form['customRadio']
+        output = []
+        mimg = []
+        mname = []
+        names = []
+        mdesc = []
 
-    link = "https://www.metacritic.com/browse/movies/genre/metascore/sci-fi?view=detailed"
-    req = requests.get(link, headers=headers)
-    soup = BeautifulSoup(req.content, features="lxml")
+        link = "https://www.metacritic.com/browse/movies/genre/"+srtname+"/sci-fi?view=detailed"
+        req = requests.get(link, headers=headers)
+        soup = BeautifulSoup(req.content, features="lxml")
 
-    for img in soup.findAll('img'):
-        mname.append(img.get('src'))
+        for img in soup.findAll('img'):
+            mname.append(img.get('src'))
 
-    for i in soup.find_all('a', class_="title"):
-        string = i.text
-        names.append(string.strip())
-    print(names)
+        for i in soup.find_all('a', class_="title"):
+            string = i.text
+            names.append(string.strip())
+        print(names)
 
-    mname1 = mname[28:]
-    for j in (mname1):
-        if j == '/images/icons/mc-mustsee-sm.svg':
-            pass
-        else:
-            mimg.append(j)
-    print(mimg)
+        mname1 = mname[29:]
+        for j in (mname1):
+            if j == '/images/icons/mc-mustsee-sm.svg':
+                pass
+            else:
+                mimg.append(j)
+        print(mimg)
 
-    for i in soup.find_all('div', class_="summary"):
-        string = i.text
-        mdesc.append(string.strip())
-    print(mdesc)
+        for i in soup.find_all('div', class_="summary"):
+            string = i.text
+            mdesc.append(string.strip())
+        print(mdesc)
 
-    for i, j, k in zip(mimg, names, mdesc):
-        output.append(i)
-        output.append(j)
-        output.append(k)
-    print(output)
-    return render_template("Anger.html", output = output)
+        for i, j, k in zip(mimg, names, mdesc):
+            output.append(i)
+            output.append(j)
+            output.append(k)
+        print(output)
+        return render_template("Anger.html", output = output)
+    else:
+        output = []
+        mimg = []
+        mname = []
+        names = []
+        mdesc = []
 
-@web.route('/Disgust')
+        link = "https://www.metacritic.com/browse/movies/genre/metascore/sci-fi?view=detailed"
+        req = requests.get(link, headers=headers)
+        soup = BeautifulSoup(req.content, features="lxml")
+
+        for img in soup.findAll('img'):
+            mname.append(img.get('src'))
+
+        for i in soup.find_all('a', class_="title"):
+            string = i.text
+            names.append(string.strip())
+        print(names)
+
+        mname1 = mname[29:]
+        for j in (mname1):
+            if j == '/images/icons/mc-mustsee-sm.svg':
+                pass
+            else:
+                mimg.append(j)
+        print(mimg)
+
+        for i in soup.find_all('div', class_="summary"):
+            string = i.text
+            mdesc.append(string.strip())
+        print(mdesc)
+
+        for i, j, k in zip(mimg, names, mdesc):
+            output.append(i)
+            output.append(j)
+            output.append(k)
+        print(output)
+        return render_template("Anger.html", output=output)
+    return render_template("Anger.html")
+
+@web.route('/Disgust', methods=['POST', 'GET'])
 def Disgust():
-    output = []
-    mimg = []
-    mname = []
-    names = []
-    mdesc = []
+    if request.method == 'POST':
+        srtname = request.form['customRadio']
+        output = []
+        mimg = []
+        mname = []
+        names = []
+        mdesc = []
 
-    link = "https://www.metacritic.com/browse/movies/genre/metascore/drama?view=detailed"
-    req = requests.get(link, headers=headers)
-    soup = BeautifulSoup(req.content, features="lxml")
+        link = "https://www.metacritic.com/browse/movies/genre/"+srtname+"/drama?view=detailed"
+        req = requests.get(link, headers=headers)
+        soup = BeautifulSoup(req.content, features="lxml")
 
-    for img in soup.findAll('img'):
-        mname.append(img.get('src'))
+        for img in soup.findAll('img'):
+            mname.append(img.get('src'))
 
-    for i in soup.find_all('a', class_="title"):
-        string = i.text
-        names.append(string.strip())
-    print(names)
+        for i in soup.find_all('a', class_="title"):
+            string = i.text
+            names.append(string.strip())
+        print(names)
 
-    mname1 = mname[28:]
-    for j in (mname1):
-        if j == '/images/icons/mc-mustsee-sm.svg':
-            pass
-        else:
-            mimg.append(j)
-    print(mimg)
+        mname1 = mname[29:]
+        for j in (mname1):
+            if j == '/images/icons/mc-mustsee-sm.svg':
+                pass
+            else:
+                mimg.append(j)
+        print(mimg)
 
-    for i in soup.find_all('div', class_="summary"):
-        string = i.text
-        mdesc.append(string.strip())
-    print(mdesc)
+        for i in soup.find_all('div', class_="summary"):
+            string = i.text
+            mdesc.append(string.strip())
+        print(mdesc)
 
-    for i, j, k in zip(mimg, names, mdesc):
-        output.append(i)
-        output.append(j)
-        output.append(k)
-    print(output)
-    return render_template("Disgust.html", output = output)
+        for i, j, k in zip(mimg, names, mdesc):
+            output.append(i)
+            output.append(j)
+            output.append(k)
+        print(output)
+        return render_template("Disgust.html", output = output)
+    else:
+        output = []
+        mimg = []
+        mname = []
+        names = []
+        mdesc = []
 
-@web.route('/Horror')
+        link = "https://www.metacritic.com/browse/movies/genre/metascore/drama?view=detailed"
+        req = requests.get(link, headers=headers)
+        soup = BeautifulSoup(req.content, features="lxml")
+
+        for img in soup.findAll('img'):
+            mname.append(img.get('src'))
+
+        for i in soup.find_all('a', class_="title"):
+            string = i.text
+            names.append(string.strip())
+        print(names)
+
+        mname1 = mname[29:]
+        for j in (mname1):
+            if j == '/images/icons/mc-mustsee-sm.svg':
+                pass
+            else:
+                mimg.append(j)
+        print(mimg)
+
+        for i in soup.find_all('div', class_="summary"):
+            string = i.text
+            mdesc.append(string.strip())
+        print(mdesc)
+
+        for i, j, k in zip(mimg, names, mdesc):
+            output.append(i)
+            output.append(j)
+            output.append(k)
+        print(output)
+        return render_template("Disgust.html", output=output)
+    return render_template("Disgust.html")
+
+@web.route('/Horror', methods=['POST', 'GET'])
 def Horror():
-    output = []
-    mimg = []
-    mname = []
-    names = []
-    mdesc = []
+    if request.method == 'POST':
+        srtname = request.form['customRadio']
+        output = []
+        mimg = []
+        mname = []
+        names = []
+        mdesc = []
 
-    link = "https://www.metacritic.com/browse/movies/genre/metascore/horror?view=detailed"
-    req = requests.get(link, headers=headers)
-    soup = BeautifulSoup(req.content, features="lxml")
+        link = "https://www.metacritic.com/browse/movies/genre/"+srtname+"/horror?view=detailed"
+        req = requests.get(link, headers=headers)
+        soup = BeautifulSoup(req.content, features="lxml")
 
-    for img in soup.findAll('img'):
-        mname.append(img.get('src'))
+        for img in soup.findAll('img'):
+            mname.append(img.get('src'))
 
-    for i in soup.find_all('a', class_="title"):
-        string = i.text
-        names.append(string.strip())
-    print(names)
+        for i in soup.find_all('a', class_="title"):
+            string = i.text
+            names.append(string.strip())
+        print(names)
 
-    mname1 = mname[28:]
-    for j in (mname1):
-        if j == '/images/icons/mc-mustsee-sm.svg':
-            pass
-        else:
-            mimg.append(j)
-    print(mimg)
+        mname1 = mname[29:]
+        for j in (mname1):
+            if j == '/images/icons/mc-mustsee-sm.svg':
+                pass
+            else:
+                mimg.append(j)
+        print(mimg)
 
-    for i in soup.find_all('div', class_="summary"):
-        string = i.text
-        mdesc.append(string.strip())
-    print(mdesc)
+        for i in soup.find_all('div', class_="summary"):
+            string = i.text
+            mdesc.append(string.strip())
+        print(mdesc)
 
-    for i, j, k in zip(mimg, names, mdesc):
-        output.append(i)
-        output.append(j)
-        output.append(k)
-    print(output)
-    return render_template("Horror.html", output = output)
+        for i, j, k in zip(mimg, names, mdesc):
+            output.append(i)
+            output.append(j)
+            output.append(k)
+        print(output)
+        return render_template("Horror.html", output = output)
+    else:
+        output = []
+        mimg = []
+        mname = []
+        names = []
+        mdesc = []
 
-@web.route('/Excitement')
+        link = "https://www.metacritic.com/browse/movies/genre/metascore/horror?view=detailed"
+        req = requests.get(link, headers=headers)
+        soup = BeautifulSoup(req.content, features="lxml")
+
+        for img in soup.findAll('img'):
+            mname.append(img.get('src'))
+
+        for i in soup.find_all('a', class_="title"):
+            string = i.text
+            names.append(string.strip())
+        print(names)
+
+        mname1 = mname[29:]
+        for j in (mname1):
+            if j == '/images/icons/mc-mustsee-sm.svg':
+                pass
+            else:
+                mimg.append(j)
+        print(mimg)
+
+        for i in soup.find_all('div', class_="summary"):
+            string = i.text
+            mdesc.append(string.strip())
+        print(mdesc)
+
+        for i, j, k in zip(mimg, names, mdesc):
+            output.append(i)
+            output.append(j)
+            output.append(k)
+        print(output)
+        return render_template("Horror.html", output=output)
+    return render_template("Horror.html")
+
+@web.route('/Excitement', methods=['POST', 'GET'])
 def Excitement():
-    output = []
-    mimg = []
-    mname = []
-    names = []
-    mdesc = []
+    if request.method == 'POST':
+        srtname = request.form['customRadio']
+        output = []
+        mimg = []
+        mname = []
+        names = []
+        mdesc = []
 
-    link = "https://www.metacritic.com/browse/movies/genre/metascore/action?view=detailed"
-    req = requests.get(link, headers=headers)
-    soup = BeautifulSoup(req.content, features="lxml")
+        link = "https://www.metacritic.com/browse/movies/genre/"+srtname+"/action?view=detailed"
+        req = requests.get(link, headers=headers)
+        soup = BeautifulSoup(req.content, features="lxml")
 
-    for img in soup.findAll('img'):
-        mname.append(img.get('src'))
+        for img in soup.findAll('img'):
+            mname.append(img.get('src'))
 
-    for i in soup.find_all('a', class_="title"):
-        string = i.text
-        names.append(string.strip())
-    print(names)
+        for i in soup.find_all('a', class_="title"):
+            string = i.text
+            names.append(string.strip())
+        print(names)
 
-    mname1 = mname[28:]
-    for j in (mname1):
-        if j == '/images/icons/mc-mustsee-sm.svg':
-            pass
-        else:
-            mimg.append(j)
-    print(mimg)
+        mname1 = mname[29:]
+        for j in (mname1):
+            if j == '/images/icons/mc-mustsee-sm.svg':
+                pass
+            else:
+                mimg.append(j)
+        print(mimg)
 
-    for i in soup.find_all('div', class_="summary"):
-        string = i.text
-        mdesc.append(string.strip())
-    print(mdesc)
+        for i in soup.find_all('div', class_="summary"):
+            string = i.text
+            mdesc.append(string.strip())
+        print(mdesc)
 
-    for i, j, k in zip(mimg, names, mdesc):
-        output.append(i)
-        output.append(j)
-        output.append(k)
-    print(output)
-    return render_template("Excitement.html", output = output)
+        for i, j, k in zip(mimg, names, mdesc):
+            output.append(i)
+            output.append(j)
+            output.append(k)
+        print(output)
+        return render_template("Excitement.html", output = output)
+    else:
+        output = []
+        mimg = []
+        mname = []
+        names = []
+        mdesc = []
 
-@web.route('/Romantic')
+        link = "https://www.metacritic.com/browse/movies/genre/metascore/action?view=detailed"
+        req = requests.get(link, headers=headers)
+        soup = BeautifulSoup(req.content, features="lxml")
+
+        for img in soup.findAll('img'):
+            mname.append(img.get('src'))
+
+        for i in soup.find_all('a', class_="title"):
+            string = i.text
+            names.append(string.strip())
+        print(names)
+
+        mname1 = mname[29:]
+        for j in (mname1):
+            if j == '/images/icons/mc-mustsee-sm.svg':
+                pass
+            else:
+                mimg.append(j)
+        print(mimg)
+
+        for i in soup.find_all('div', class_="summary"):
+            string = i.text
+            mdesc.append(string.strip())
+        print(mdesc)
+
+        for i, j, k in zip(mimg, names, mdesc):
+            output.append(i)
+            output.append(j)
+            output.append(k)
+        print(output)
+        return render_template("Excitement.html", output=output)
+    return render_template("Excitement.html")
+
+@web.route('/Romantic', methods=['POST', 'GET'])
 def Romantic():
-    output = []
-    mimg = []
-    mname = []
-    names = []
-    mdesc = []
+    if request.method == 'POST':
+        srtname = request.form['customRadio']
+        output = []
+        mimg = []
+        mname = []
+        names = []
+        mdesc = []
 
-    link = "https://www.metacritic.com/browse/movies/genre/metascore/romance?view=detailed"
-    req = requests.get(link, headers=headers)
-    soup = BeautifulSoup(req.content, features="lxml")
+        link = "https://www.metacritic.com/browse/movies/genre/"+srtname+"/romance?view=detailed"
+        req = requests.get(link, headers=headers)
+        soup = BeautifulSoup(req.content, features="lxml")
 
-    for img in soup.findAll('img'):
-        mname.append(img.get('src'))
+        for img in soup.findAll('img'):
+            mname.append(img.get('src'))
 
-    for i in soup.find_all('a', class_="title"):
-        string = i.text
-        names.append(string.strip())
-    print(names)
+        for i in soup.find_all('a', class_="title"):
+            string = i.text
+            names.append(string.strip())
+        print(names)
 
-    mname1 = mname[28:]
-    for j in (mname1):
-        if j == '/images/icons/mc-mustsee-sm.svg':
-            pass
-        else:
-            mimg.append(j)
-    print(mimg)
+        mname1 = mname[29:]
+        for j in (mname1):
+            if j == '/images/icons/mc-mustsee-sm.svg':
+                pass
+            else:
+                mimg.append(j)
+        print(mimg)
 
-    for i in soup.find_all('div', class_="summary"):
-        string = i.text
-        mdesc.append(string.strip())
-    print(mdesc)
+        for i in soup.find_all('div', class_="summary"):
+            string = i.text
+            mdesc.append(string.strip())
+        print(mdesc)
 
-    for i, j, k in zip(mimg, names, mdesc):
-        output.append(i)
-        output.append(j)
-        output.append(k)
-    print(output)
-    return render_template("Romantic.html", output = output)
+        for i, j, k in zip(mimg, names, mdesc):
+            output.append(i)
+            output.append(j)
+            output.append(k)
+        print(output)
+        return render_template("Romantic.html", output = output)
+    else:
+        output = []
+        mimg = []
+        mname = []
+        names = []
+        mdesc = []
+
+        link = "https://www.metacritic.com/browse/movies/genre/metascore/romance?view=detailed"
+        req = requests.get(link, headers=headers)
+        soup = BeautifulSoup(req.content, features="lxml")
+
+        for img in soup.findAll('img'):
+            mname.append(img.get('src'))
+
+        for i in soup.find_all('a', class_="title"):
+            string = i.text
+            names.append(string.strip())
+        print(names)
+
+        mname1 = mname[29:]
+        for j in (mname1):
+            if j == '/images/icons/mc-mustsee-sm.svg':
+                pass
+            else:
+                mimg.append(j)
+        print(mimg)
+
+        for i in soup.find_all('div', class_="summary"):
+            string = i.text
+            mdesc.append(string.strip())
+        print(mdesc)
+
+        for i, j, k in zip(mimg, names, mdesc):
+            output.append(i)
+            output.append(j)
+            output.append(k)
+        print(output)
+        return render_template("Romantic.html", output=output)
+    return render_template("Romantic.html")
 
 
 if __name__ == '__main__':

@@ -23,12 +23,13 @@
             <h3 class="float-left mb-0 p-1 btn-dark rounded rainbow">Movies2Watch</h3>
             <nav class="nav nav-masthead justify-content-center btn-group btn-group-toggle float-right ">
 
-                <form class="form-inline my-2 my-lg-0">
-                  <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                <form class="form-inline my-2 my-lg-0" action="/MSearch" method="post">
+                  <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="Search">
                   <button class="btn btn-outline-primary my-2 my-sm-0">Search</button>
-                </form>&ensp;
+                </form>&ensp;&ensp;
                 {% if session.LoggedIn %}
                     <div class="btn-group" role="group">
+                        <a class="nav-link btn btn-dark Profile_lnkhov" href="/">Home</a>
                         <button class="nav-link btn btn-dark dropdown-toggle home_lnkhov" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Account</button>
                         <div class="dropdown-menu bg-dark">
                             <button class="dropdown-item bg-dark disabled" style="color: #e7d84b">Welcome {{ session.Fname }}</button>
@@ -59,8 +60,35 @@
 
 
         <main style="padding-top: 130px">
+            <div class="px-5">
+                <div class="dropdown float-right">
+                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Sort By:
+                  </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <form action="/Disgust" method="post">
+                            <div class="custom-control custom-radio">
+                                <button type="radio" id="customRadio1" name="customRadio" value="metascore" class="custom-control-input"></button>
+                                <label class="custom-control-label" for="customRadio1">MetaScore</label>
+                            </div>
+                            <div class="custom-control custom-radio">
+                                <button type="radio" id="customRadio2" name="customRadio" value="userscore" class="custom-control-input"></button>
+                                <label class="custom-control-label" for="customRadio2">User Score</label>
+                            </div>
+                            <div class="custom-control custom-radio">
+                                <button type="radio" id="customRadio3" name="customRadio" value="date" class="custom-control-input"></button>
+                                <label class="custom-control-label" for="customRadio3">Date</label>
+                            </div>
+                            <div class="custom-control custom-radio">
+                                <button type="radio" id="customRadio4" name="customRadio" value="name" class="custom-control-input"></button>
+                                <label class="custom-control-label" for="customRadio4">Name</label>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
 
-            <table class="table-bordered ">
+            <table>
                     {% for i in range(0,(output | count),3) %}
 
                     <tr>
