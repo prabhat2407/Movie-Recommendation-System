@@ -131,7 +131,65 @@ def Home():
 
     return render_template('Home.html')
 
+@web.route('/SortMovie', methods=['POST', 'GET'])
+def SortMovie():
+    if 'LoggedIn' in session:
+        sess = session['Id']
+        sess = str(sess)
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT Genre FROM fav WHERE Id = '" + sess + "'")
+        gdata = cur.fetchone()
 
+        if request.method == 'POST':
+            srtname = request.form['customRadio']
+
+        def Genre():
+            out = []
+            gimg = []
+            gname = []
+            name = []
+            gdesc = []
+
+            # g = str(gdata)
+            if gdata == None:
+                pass
+            else:
+                g = gdata[0]
+                genre = g.lower()
+                link = "https://www.metacritic.com/browse/movies/genre/"+ srtname +"/" + genre + "?view=detailed"
+                req = requests.get(link, headers=headers)
+                soup = BeautifulSoup(req.content, features="lxml")
+
+                for img in soup.findAll('img'):
+                    gname.append(img.get('src'))
+                print(gname)
+
+                for i in soup.find_all('a', class_="title"):
+                    string = i.text
+                    name.append(string.strip())
+                print(name)
+
+                gname1 = gname[29:]
+                for j in (gname1):
+                    if j == '/images/icons/mc-mustsee-sm.svg':
+                        pass
+                    else:
+                        gimg.append(j)
+                print(gimg)
+
+                for i in soup.find_all('div', class_="summary"):
+                    string = i.text
+                    gdesc.append(string.strip())
+                print(gdesc)
+
+                for i, j, k in zip(gimg, name, gdesc):
+                    out.append(i)
+                    out.append(j)
+                    out.append(k)
+                print(out)
+            return out
+        out = Genre()
+    return render_template('SortMovie.html', out = out)
 
 @web.route('/Genreform', methods=['POST', 'GET'])
 def Genreform():
@@ -332,7 +390,7 @@ def MSearch():
 def Genre():
     return render_template("Genre.html")
 
-@web.route('/Sad')
+@web.route('/Sad', methods=['POST', 'GET'])
 def Sad():
 
     if request.method == 'POST':
