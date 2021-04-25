@@ -3,10 +3,10 @@ body {
     font-family: Cambria;
 }
 
-.home_lnkhov, .Profile_lnkhov, .login_lnkhov, .SortMovie_lnkhov {
+.home_lnkhov, .Profile_lnkhov, .login_lnkhov {
     color: white;
 }
-.home_lnkhov:hover, .login_lnkhov:hover {
+.home_lnkhov:hover, .login_lnkhov:hover, .SortMovie_lnkhov {
     color: #e7d84b;
 }
 
