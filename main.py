@@ -40,20 +40,20 @@ def Home():
         for i in msoup.find_all('a', class_="title"):
             string = i.text
             names.append(string.strip())
-        print(names)
+        # print(names)
 
-        mname1 = mname[29:]
+        mname1 = mname[30:]
         for j in (mname1):
             if j == '/images/icons/mc-mustsee-sm.svg':
                 pass
             else:
                 mimg.append(j)
-        print(mimg)
+        # print(mimg)
 
         for i in msoup.find_all('div', class_="summary"):
             string = i.text
             mdesc.append(string.strip())
-        print(mdesc)
+        # print(mdesc)
 
         for i,j,k in zip(mimg,names,mdesc):
             output.append(i)
@@ -90,26 +90,25 @@ def Home():
 
                 for img in soup.findAll('img'):
                     gname.append(img.get('src'))
-                print(gname)
+                # print(gname)
 
                 for i in soup.find_all('a', class_="title"):
                     string = i.text
                     name.append(string.strip())
-                print(name)
+                # print(name)
 
-
-                gname1 = gname[29:]
+                gname1 = gname[30:]
                 for j in (gname1):
                     if j == '/images/icons/mc-mustsee-sm.svg':
                         pass
                     else:
                         gimg.append(j)
-                print(gimg)
+                # print(gimg)
 
                 for i in soup.find_all('div', class_="summary"):
                     string = i.text
                     gdesc.append(string.strip())
-                print(gdesc)
+                # print(gdesc)
 
                 for i, j, k in zip(gimg, name, gdesc):
                     out.append(i)
@@ -162,25 +161,25 @@ def SortMovie():
 
                 for img in soup.findAll('img'):
                     gname.append(img.get('src'))
-                print(gname)
+                # print(gname)
 
                 for i in soup.find_all('a', class_="title"):
                     string = i.text
                     name.append(string.strip())
-                print(name)
+                # print(name)
 
-                gname1 = gname[29:]
+                gname1 = gname[30:]
                 for j in (gname1):
                     if j == '/images/icons/mc-mustsee-sm.svg':
                         pass
                     else:
                         gimg.append(j)
-                print(gimg)
+                # print(gimg)
 
                 for i in soup.find_all('div', class_="summary"):
                     string = i.text
                     gdesc.append(string.strip())
-                print(gdesc)
+                # print(gdesc)
 
                 for i, j, k in zip(gimg, name, gdesc):
                     out.append(i)
@@ -332,58 +331,111 @@ def Profile():
 
 @web.route('/MSearch',methods=['POST','GET'])
 def MSearch():
-    if request.method == 'POST':
-        search = request.form['Search']
-        s = search.replace(' ','%20')
-        print(s)
-        out = []
-        sname = []
-        names = []
-        simg = []
-        sdesc = []
+    if 'LoggedIn' in session:
+        if request.method == 'POST':
+            search = request.form['Search']
+            s = search.replace(' ','%20')
+            print(s)
+            out = []
+            sname = []
+            names = []
+            simg = []
+            sdesc = []
 
-        ssource = "https://www.metacritic.com/search/movie/"+s+"/results"
-        sreq = requests.get(ssource, headers = headers)
-        ssoup = BeautifulSoup(sreq.content, features = "lxml")
+            ssource = "https://www.metacritic.com/search/movie/"+s+"/results"
+            sreq = requests.get(ssource, headers = headers)
+            ssoup = BeautifulSoup(sreq.content, features = "lxml")
 
 
-        for img in ssoup.findAll('img'):
-            sname.append(img.get('alt'))
+            for img in ssoup.findAll('img'):
+                sname.append(img.get('alt'))
 
-        for i in sname[28:]:
-            if i != None:
-                names.append(i[:-9])
-            else:
-                pass
-        print(names)
+            for i in sname[29:]:
+                if i != None:
+                    names.append(i[:-9])
+                else:
+                    pass
+            # print(names)
 
-        ssimg = []
-        seimg =[]
-        for img in ssoup.findAll('img'):
-            simg.append(img.get('src'))
-        # for i in simg:
-        #     # print(i)
-        for j in simg:
-            if j == '/images/icons/mc-mustsee-sm.svg':
-                pass
-            else:
-                ssimg.append(j)
-        for i in ssimg[27:]:
-            seimg.append(i)
-        print(seimg)
+            ssimg = []
+            seimg =[]
+            for img in ssoup.findAll('img'):
+                simg.append(img.get('src'))
+            # for i in simg:
+            #     # print(i)
+            for j in simg:
+                if j == '/images/icons/mc-mustsee-sm.svg':
+                    pass
+                else:
+                    ssimg.append(j)
+            for i in ssimg[28:]:
+                seimg.append(i)
+            # print(seimg)
 
-        for i in ssoup.find_all('p', class_="deck basic_stat"):
-            string = i.text
-            sdesc.append(string.strip())
-        print(sdesc)
+            for i in ssoup.find_all('p', class_="deck basic_stat"):
+                string = i.text
+                sdesc.append(string.strip())
+            # print(sdesc)
 
-        for i, j, k in zip(seimg, names, sdesc):
-            out.append(i)
-            out.append(j)
-            out.append(k)
-        print(out)
+            for i, j, k in zip(seimg, names, sdesc):
+                out.append(i)
+                out.append(j)
+                out.append(k)
+            print(out)
 
-        return render_template("Home.html", out = out)
+            return render_template("Home.html", out = out)
+        else:
+            if request.method == 'POST':
+                search = request.form['Search']
+                s = search.replace(' ', '%20')
+                print(s)
+                out = []
+                sname = []
+                names = []
+                simg = []
+                sdesc = []
+
+                ssource = "https://www.metacritic.com/search/movie/" + s + "/results"
+                sreq = requests.get(ssource, headers=headers)
+                ssoup = BeautifulSoup(sreq.content, features="lxml")
+
+                for img in ssoup.findAll('img'):
+                    sname.append(img.get('alt'))
+
+                for i in sname[29:]:
+                    if i != None:
+                        names.append(i[:-9])
+                    else:
+                        pass
+                # print(names)
+
+                ssimg = []
+                seimg = []
+                for img in ssoup.findAll('img'):
+                    simg.append(img.get('src'))
+                # for i in simg:
+                #     # print(i)
+                for j in simg:
+                    if j == '/images/icons/mc-mustsee-sm.svg':
+                        pass
+                    else:
+                        ssimg.append(j)
+                for i in ssimg[28:]:
+                    seimg.append(i)
+                # print(seimg)
+
+                for i in ssoup.find_all('p', class_="deck basic_stat"):
+                    string = i.text
+                    sdesc.append(string.strip())
+                # print(sdesc)
+
+                for i, j, k in zip(seimg, names, sdesc):
+                    out.append(i)
+                    out.append(j)
+                    out.append(k)
+                print(out)
+
+                return render_template("Home.html", out=out)
     return render_template("Home.html")
 
 @web.route('/Genre')
@@ -411,20 +463,20 @@ def Sad():
         for i in soup.find_all('a', class_="title"):
             string = i.text
             names.append(string.strip())
-        print(names)
+        # print(names)
 
-        mname1 = mname[29:]
+        mname1 = mname[30:]
         for j in (mname1):
             if j == '/images/icons/mc-mustsee-sm.svg':
                 pass
             else:
                 mimg.append(j)
-        print(mimg)
+        # print(mimg)
 
         for i in soup.find_all('div', class_="summary"):
             string = i.text
             mdesc.append(string.strip())
-        print(mdesc)
+        # print(mdesc)
 
         for i, j, k in zip(mimg, names, mdesc):
             output.append(i)
@@ -449,20 +501,20 @@ def Sad():
         for i in soup.find_all('a', class_="title"):
             string = i.text
             names.append(string.strip())
-        print(names)
+        # print(names)
 
-        mname1 = mname[29:]
+        mname1 = mname[30:]
         for j in (mname1):
             if j == '/images/icons/mc-mustsee-sm.svg':
                 pass
             else:
                 mimg.append(j)
-        print(mimg)
+        # print(mimg)
 
         for i in soup.find_all('div', class_="summary"):
             string = i.text
             mdesc.append(string.strip())
-        print(mdesc)
+        # print(mdesc)
 
         for i, j, k in zip(mimg, names, mdesc):
             output.append(i)
@@ -492,20 +544,20 @@ def Anger():
         for i in soup.find_all('a', class_="title"):
             string = i.text
             names.append(string.strip())
-        print(names)
+        # print(names)
 
-        mname1 = mname[29:]
+        mname1 = mname[30:]
         for j in (mname1):
             if j == '/images/icons/mc-mustsee-sm.svg':
                 pass
             else:
                 mimg.append(j)
-        print(mimg)
+        # print(mimg)
 
         for i in soup.find_all('div', class_="summary"):
             string = i.text
             mdesc.append(string.strip())
-        print(mdesc)
+        # print(mdesc)
 
         for i, j, k in zip(mimg, names, mdesc):
             output.append(i)
@@ -530,20 +582,20 @@ def Anger():
         for i in soup.find_all('a', class_="title"):
             string = i.text
             names.append(string.strip())
-        print(names)
+        # print(names)
 
-        mname1 = mname[29:]
+        mname1 = mname[30:]
         for j in (mname1):
             if j == '/images/icons/mc-mustsee-sm.svg':
                 pass
             else:
                 mimg.append(j)
-        print(mimg)
+        # print(mimg)
 
         for i in soup.find_all('div', class_="summary"):
             string = i.text
             mdesc.append(string.strip())
-        print(mdesc)
+        # print(mdesc)
 
         for i, j, k in zip(mimg, names, mdesc):
             output.append(i)
@@ -573,20 +625,20 @@ def Disgust():
         for i in soup.find_all('a', class_="title"):
             string = i.text
             names.append(string.strip())
-        print(names)
+        # print(names)
 
-        mname1 = mname[29:]
+        mname1 = mname[30:]
         for j in (mname1):
             if j == '/images/icons/mc-mustsee-sm.svg':
                 pass
             else:
                 mimg.append(j)
-        print(mimg)
+        # print(mimg)
 
         for i in soup.find_all('div', class_="summary"):
             string = i.text
             mdesc.append(string.strip())
-        print(mdesc)
+        # print(mdesc)
 
         for i, j, k in zip(mimg, names, mdesc):
             output.append(i)
@@ -611,20 +663,20 @@ def Disgust():
         for i in soup.find_all('a', class_="title"):
             string = i.text
             names.append(string.strip())
-        print(names)
+        # print(names)
 
-        mname1 = mname[29:]
+        mname1 = mname[30:]
         for j in (mname1):
             if j == '/images/icons/mc-mustsee-sm.svg':
                 pass
             else:
                 mimg.append(j)
-        print(mimg)
+        # print(mimg)
 
         for i in soup.find_all('div', class_="summary"):
             string = i.text
             mdesc.append(string.strip())
-        print(mdesc)
+        # print(mdesc)
 
         for i, j, k in zip(mimg, names, mdesc):
             output.append(i)
@@ -654,20 +706,20 @@ def Horror():
         for i in soup.find_all('a', class_="title"):
             string = i.text
             names.append(string.strip())
-        print(names)
+        # print(names)
 
-        mname1 = mname[29:]
+        mname1 = mname[30:]
         for j in (mname1):
             if j == '/images/icons/mc-mustsee-sm.svg':
                 pass
             else:
                 mimg.append(j)
-        print(mimg)
+        # print(mimg)
 
         for i in soup.find_all('div', class_="summary"):
             string = i.text
             mdesc.append(string.strip())
-        print(mdesc)
+        # print(mdesc)
 
         for i, j, k in zip(mimg, names, mdesc):
             output.append(i)
@@ -692,20 +744,20 @@ def Horror():
         for i in soup.find_all('a', class_="title"):
             string = i.text
             names.append(string.strip())
-        print(names)
+        # print(names)
 
-        mname1 = mname[29:]
+        mname1 = mname[30:]
         for j in (mname1):
             if j == '/images/icons/mc-mustsee-sm.svg':
                 pass
             else:
                 mimg.append(j)
-        print(mimg)
+        # print(mimg)
 
         for i in soup.find_all('div', class_="summary"):
             string = i.text
             mdesc.append(string.strip())
-        print(mdesc)
+        # print(mdesc)
 
         for i, j, k in zip(mimg, names, mdesc):
             output.append(i)
@@ -735,20 +787,20 @@ def Excitement():
         for i in soup.find_all('a', class_="title"):
             string = i.text
             names.append(string.strip())
-        print(names)
+        # print(names)
 
-        mname1 = mname[29:]
+        mname1 = mname[30:]
         for j in (mname1):
             if j == '/images/icons/mc-mustsee-sm.svg':
                 pass
             else:
                 mimg.append(j)
-        print(mimg)
+        # print(mimg)
 
         for i in soup.find_all('div', class_="summary"):
             string = i.text
             mdesc.append(string.strip())
-        print(mdesc)
+        # print(mdesc)
 
         for i, j, k in zip(mimg, names, mdesc):
             output.append(i)
@@ -773,20 +825,20 @@ def Excitement():
         for i in soup.find_all('a', class_="title"):
             string = i.text
             names.append(string.strip())
-        print(names)
+        # print(names)
 
-        mname1 = mname[29:]
+        mname1 = mname[30:]
         for j in (mname1):
             if j == '/images/icons/mc-mustsee-sm.svg':
                 pass
             else:
                 mimg.append(j)
-        print(mimg)
+        # print(mimg)
 
         for i in soup.find_all('div', class_="summary"):
             string = i.text
             mdesc.append(string.strip())
-        print(mdesc)
+        # print(mdesc)
 
         for i, j, k in zip(mimg, names, mdesc):
             output.append(i)
@@ -816,20 +868,20 @@ def Romantic():
         for i in soup.find_all('a', class_="title"):
             string = i.text
             names.append(string.strip())
-        print(names)
+        # print(names)
 
-        mname1 = mname[29:]
+        mname1 = mname[30:]
         for j in (mname1):
             if j == '/images/icons/mc-mustsee-sm.svg':
                 pass
             else:
                 mimg.append(j)
-        print(mimg)
+        # print(mimg)
 
         for i in soup.find_all('div', class_="summary"):
             string = i.text
             mdesc.append(string.strip())
-        print(mdesc)
+        # print(mdesc)
 
         for i, j, k in zip(mimg, names, mdesc):
             output.append(i)
@@ -854,20 +906,20 @@ def Romantic():
         for i in soup.find_all('a', class_="title"):
             string = i.text
             names.append(string.strip())
-        print(names)
+        # print(names)
 
-        mname1 = mname[29:]
+        mname1 = mname[30:]
         for j in (mname1):
             if j == '/images/icons/mc-mustsee-sm.svg':
                 pass
             else:
                 mimg.append(j)
-        print(mimg)
+        # print(mimg)
 
         for i in soup.find_all('div', class_="summary"):
             string = i.text
             mdesc.append(string.strip())
-        print(mdesc)
+        # print(mdesc)
 
         for i, j, k in zip(mimg, names, mdesc):
             output.append(i)

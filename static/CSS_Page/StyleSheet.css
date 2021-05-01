@@ -1,12 +1,24 @@
 body {
-    background-color: #35363a;
-    font-family: Cambria;
+    font-family: 'Arvo', serif;
+    background-image: url("/static/bg.jpg");
+    background-position: center;
+    background-size: cover;
+
+}
+
+h3 {
+    font-family:'Monoton', cursive;
+
+}
+
+a,button {
+    font-family: 'Roboto Mono', monospace;
 }
 
 .home_lnkhov, .Profile_lnkhov, .login_lnkhov {
     color: white;
 }
-.home_lnkhov:hover, .login_lnkhov:hover, .SortMovie_lnkhov {
+.home_lnkhov:hover, .login_lnkhov:hover {
     color: #e7d84b;
 }
 
@@ -60,4 +72,12 @@ body {
 
 #NewPasswordPhoneShowHide {
     display: none;
+}
+
+table, th, td {
+  border: 1px solid black;
+}
+
+tr:hover {
+    background-color: #c4bfbf;
 }
