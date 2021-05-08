@@ -97,7 +97,7 @@ def Home():
                     name.append(string.strip())
                 # print(name)
 
-                gname1 = gname[30:]
+                gname1 = gname[29:]
                 for j in (gname1):
                     if j == '/images/icons/mc-mustsee-sm.svg':
                         pass
@@ -120,7 +120,7 @@ def Home():
         out = Genre()
 
         if gdata == None:
-            return render_template('Home.html', gdata = gdata, output = output)
+            return render_template('Home.html', gdata = gdata, agegen = agegen)
         elif gdata:
             return render_template('Home.html', out = out)
         else:
