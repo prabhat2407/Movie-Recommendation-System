@@ -72,16 +72,16 @@
                     <br><br><br>
 
                     <table>
-                        {% for i in range(0,(output | count),3) %}
+                        {% for i in range(0,(agegen | count),3) %}
                         <tr>
                             <td>
-                                <img src="{{ output[i] }}">
+                                <img src="{{ agegen[i] }}">
                             </td>
                             <td class="text-black">
-                                {{ output[i + 1] }}
+                                {{ agegen[i + 1] }}
                             </td>
                             <td class="text-black">
-                                {{ output[i + 2] }}
+                                {{ agegen[i + 2] }}
                             </td>
                         </tr>
                         {% endfor %}
@@ -131,6 +131,7 @@
                         {% endfor %}
                     </table>
                 {% endif %}
+
             {% else %}
                 <table>
                     {% for i in range(0,(output | count),3) %}

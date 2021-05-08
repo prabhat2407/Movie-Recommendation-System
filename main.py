@@ -59,10 +59,9 @@ def Home():
             output.append(i)
             output.append(j)
             output.append(k)
-        print(output)
+        # print(output)
         return output
     output = Output()
-
 
     if 'LoggedIn' in session:
         sess = session['Id']
@@ -73,6 +72,7 @@ def Home():
 
         def Genre():
             out = []
+            ageggen = []
             gimg = []
             gname = []
             name = []
@@ -80,7 +80,65 @@ def Home():
 
             # g = str(gdata)
             if gdata == None:
-                pass
+                AgeGroup = session['AgeGroup']
+
+                cur.execute("SELECT Id FROM users WHERE AgeGroup='" + AgeGroup + "'")
+                Idlist = cur.fetchall()
+
+                a = []
+
+                for i in Idlist:
+                    for j in i:
+                        a.append(j)
+
+                k = str(a)
+
+                cur.execute("SELECT Genre FROM fav WHERE Id IN "+ k.replace("[","(").replace("]",")") + "")
+                Gen = cur.fetchall()
+
+                Agegen = []
+
+                for i in Gen:
+                    for j in i:
+                        Agegen.append(j)
+
+                agegenre = max(Agegen, key=Agegen.count)
+                print(agegenre)
+
+                age = agegenre.lower()
+                link = "https://www.metacritic.com/browse/movies/genre/metascore/"+age+"?view=detailed"
+                req = requests.get(link, headers=headers)
+                soup = BeautifulSoup(req.content, features="lxml")
+
+                for img in soup.findAll('img'):
+                    gname.append(img.get('src'))
+                # print(gname)
+
+                for i in soup.find_all('a', class_="title"):
+                    string = i.text
+                    name.append(string.strip())
+                # print(name)
+
+                gname1 = gname[29:]
+                for j in (gname1):
+                    if j == '/images/icons/mc-mustsee-sm.svg':
+                        pass
+                    else:
+                        gimg.append(j)
+                # print(gimg)
+
+                for i in soup.find_all('div', class_="summary"):
+                    string = i.text
+                    gdesc.append(string.strip())
+                # print(gdesc)
+
+                for i, j, k in zip(gimg, name, gdesc):
+                    ageggen.append(i)
+                    ageggen.append(j)
+                    ageggen.append(k)
+                print(ageggen)
+                return ageggen
+
             else:
                 g = gdata[0]
                 genre = g.lower()
@@ -118,6 +176,7 @@ def Home():
             return out
 
         out = Genre()
+        agegen = Genre()
 
         if gdata == None:
             return render_template('Home.html', gdata = gdata, agegen = agegen)
@@ -218,6 +277,7 @@ def Register():
         Email = request.form['RegisterInputEmail']
         Paswd = request.form['RegisterInputPassword']
         Phone = request.form['RegisterInputPhoneNo']
+        AgeGroup = request.form['AgeGroup']
 
         cur = mysql.connection.cursor()
         cur.execute("SELECT Email FROM USERS WHERE Email ='" + Email + "'")
@@ -233,7 +293,7 @@ def Register():
             ErMessage = 'Phone No. Already Exist!!'
             return render_template('Register.html', ErMessage = ErMessage)
         else:
-            cur.execute("INSERT INTO USERS (Fname, Lname, Email, Paswd, Phone) VALUES (%s, %s, %s, %s, %s)", (Fname, Lname, Email, Paswd, Phone))
+            cur.execute("INSERT INTO USERS (Fname, Lname, Email, Paswd, Phone, AgeGroup) VALUES (%s, %s, %s, %s, %s, %s)", (Fname, Lname, Email, Paswd, Phone, AgeGroup))
             mysql.connection.commit()
             return render_template('Login.html')
 
@@ -256,6 +316,7 @@ def Login():
             session['Lname'] = AccDetails['Lname']
             session['Email'] = AccDetails['Email']
             session['Phone'] = AccDetails['Phone']
+            session['AgeGroup'] = AccDetails['AgeGroup']
             return redirect(url_for('Home'))
         else:
             ErMessage = 'Email Id or Password Invalid!!'
@@ -331,112 +392,60 @@ def Profile():
 
 @web.route('/MSearch',methods=['POST','GET'])
 def MSearch():
-    if 'LoggedIn' in session:
-        if request.method == 'POST':
-            search = request.form['Search']
-            s = search.replace(' ','%20')
-            print(s)
-            out = []
-            sname = []
-            names = []
-            simg = []
-            sdesc = []
+    if request.method == 'POST':
+        search = request.form['Search']
+        s = search.replace(' ','%20')
+        print(s)
+        out = []
+        sname = []
+        names = []
+        simg = []
+        sdesc = []
 
-            ssource = "https://www.metacritic.com/search/movie/"+s+"/results"
-            sreq = requests.get(ssource, headers = headers)
-            ssoup = BeautifulSoup(sreq.content, features = "lxml")
+        ssource = "https://www.metacritic.com/search/movie/"+s+"/results"
+        sreq = requests.get(ssource, headers = headers)
+        ssoup = BeautifulSoup(sreq.content, features = "lxml")
 
 
-            for img in ssoup.findAll('img'):
-                sname.append(img.get('alt'))
+        for img in ssoup.findAll('img'):
+            sname.append(img.get('alt'))
 
-            for i in sname[29:]:
-                if i != None:
-                    names.append(i[:-9])
-                else:
-                    pass
-            # print(names)
+        for i in sname[28:]:
+            if i != None:
+                names.append(i[:-9])
+            else:
+                pass
+        # print(names)
 
-            ssimg = []
-            seimg =[]
-            for img in ssoup.findAll('img'):
-                simg.append(img.get('src'))
-            # for i in simg:
-            #     # print(i)
-            for j in simg:
-                if j == '/images/icons/mc-mustsee-sm.svg':
-                    pass
-                else:
-                    ssimg.append(j)
-            for i in ssimg[28:]:
-                seimg.append(i)
-            # print(seimg)
+        ssimg = []
+        seimg =[]
+        for img in ssoup.findAll('img'):
+            simg.append(img.get('src'))
+        # for i in simg:
+        #     # print(i)
+        for j in simg:
+            if j == '/images/icons/mc-mustsee-sm.svg':
+                pass
+            else:
+                ssimg.append(j)
+        for i in ssimg[27:]:
+            seimg.append(i)
+        # print(seimg)
 
-            for i in ssoup.find_all('p', class_="deck basic_stat"):
-                string = i.text
-                sdesc.append(string.strip())
-            # print(sdesc)
+        for i in ssoup.find_all('p', class_="deck basic_stat"):
+            string = i.text
+            sdesc.append(string.strip())
+        # print(sdesc)
 
-            for i, j, k in zip(seimg, names, sdesc):
-                out.append(i)
-                out.append(j)
-                out.append(k)
-            print(out)
+        for i, j, k in zip(seimg, names, sdesc):
+            out.append(i)
+            out.append(j)
+            out.append(k)
+        print(out)
 
-            return render_template("Home.html", out = out)
-        else:
-            if request.method == 'POST':
-                search = request.form['Search']
-                s = search.replace(' ', '%20')
-                print(s)
-                out = []
-                sname = []
-                names = []
-                simg = []
-                sdesc = []
+        return render_template("Search.html", out = out)
 
-                ssource = "https://www.metacritic.com/search/movie/" + s + "/results"
-                sreq = requests.get(ssource, headers=headers)
-                ssoup = BeautifulSoup(sreq.content, features="lxml")
-
-                for img in ssoup.findAll('img'):
-                    sname.append(img.get('alt'))
-
-                for i in sname[29:]:
-                    if i != None:
-                        names.append(i[:-9])
-                    else:
-                        pass
-                # print(names)
-
-                ssimg = []
-                seimg = []
-                for img in ssoup.findAll('img'):
-                    simg.append(img.get('src'))
-                # for i in simg:
-                #     # print(i)
-                for j in simg:
-                    if j == '/images/icons/mc-mustsee-sm.svg':
-                        pass
-                    else:
-                        ssimg.append(j)
-                for i in ssimg[28:]:
-                    seimg.append(i)
-                # print(seimg)
-
-                for i in ssoup.find_all('p', class_="deck basic_stat"):
-                    string = i.text
-                    sdesc.append(string.strip())
-                # print(sdesc)
-
-                for i, j, k in zip(seimg, names, sdesc):
-                    out.append(i)
-                    out.append(j)
-                    out.append(k)
-                print(out)
-
-                return render_template("Home.html", out=out)
-    return render_template("Home.html")
+    return render_template("Search.html")
 
 @web.route('/Genre')
 def Genre():
