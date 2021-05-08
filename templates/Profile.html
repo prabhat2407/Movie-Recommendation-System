@@ -50,7 +50,7 @@
                     <p class="card-text"><b>Name : {{ session.Fname }} {{ session.Lname }}</b></p>
                     <p class="card-text"><b>Email Id : {{ session.Email }}</b></p>
                     <p class="card-text"><b>Phone No. : {{ session.Phone }}</b></p>
-                    <p class="card-text"><b>Genre : {{ gdata }}</b>&ensp;<u><a href="Genre">Change</a></u></p>
+                    <p class="card-text"><b>Genre : {% if gdata %} {{ gdata }} </b>&ensp;<u><a href="Genre">Change</a></u> {% else %}<b> Null </b>&ensp;<u><a href="Genre">Select</a></u></p> {% endif %}
                 </div>
             </div><br>
 

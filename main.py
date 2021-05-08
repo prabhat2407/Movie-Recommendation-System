@@ -385,9 +385,12 @@ def Profile():
         cur = mysql.connection.cursor()
         cur.execute("SELECT Genre FROM fav WHERE Id = '" + sess + "'")
         gdata = cur.fetchone()
-        g = gdata[0]
-        print(gdata)
-        return render_template('Profile.html', gdata = g)
+        if gdata == None:
+            pass
+        else:
+            g = gdata[0]
+            print(gdata)
+            return render_template('Profile.html', gdata = g)
     return render_template('Profile.html')
 
 @web.route('/MSearch',methods=['POST','GET'])
